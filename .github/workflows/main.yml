@@ -70,7 +70,7 @@ jobs:
           TARGET: ${{ secrets.REMOTE_TARGET }}
       - name: Run
         run:
-          echo ${{ secrets.PRIVATE_KEY }} > ~/.ssh/deploy_key
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/deploy_key
           #ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "sh java/run.sh"
         
           
