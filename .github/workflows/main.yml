@@ -69,11 +69,9 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
       - name: Run
-        run: |
-          pwd
-          ls -a ~
+        run: 
         #echo ${{ secrets.PRIVATE_KEY }} > ~/.ssh/id_rsa
-        #ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "sh java/run.sh"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "sh java/run.sh"
         
           
 
