@@ -14,5 +14,5 @@ public class ViewHistory {
     private Integer id;
 
     @ManyToOne
-    private User user;
+    private Customer customer;
 }

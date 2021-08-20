@@ -15,7 +15,7 @@ public class SearchHistory {
     private Integer id;
 
     @ManyToOne
-    private User user;
+    private Customer customer;
 
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime localDateTime;

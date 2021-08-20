@@ -14,7 +14,7 @@ public class SearchHistoryController {
         this.searchHistoryRepository = searchHistoryRepository;
     }
 
-    @GetMapping("/test")
+    @GetMapping("/api/test")
     ResponseEntity<?> test(){
         SearchHistory s = new SearchHistory();
         s.setLocalDateTime(LocalDateTime.now());
