@@ -1,4 +1,4 @@
-package com.wudaokou.backend;
+package com.wudaokou.backend.security;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

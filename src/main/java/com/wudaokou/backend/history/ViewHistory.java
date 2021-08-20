@@ -1,5 +1,6 @@
-package com.wudaokou.backend;
+package com.wudaokou.backend.history;
 
+import com.wudaokou.backend.login.Customer;
 import lombok.Getter;
 import lombok.Setter;
 

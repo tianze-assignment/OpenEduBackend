@@ -1,5 +1,7 @@
-package com.wudaokou.backend;
+package com.wudaokou.backend.login;
 
+import com.wudaokou.backend.history.SearchHistory;
+import com.wudaokou.backend.history.ViewHistory;
 import lombok.*;
 
 import javax.persistence.*;

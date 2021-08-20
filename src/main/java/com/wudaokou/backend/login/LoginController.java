@@ -1,4 +1,4 @@
-package com.wudaokou.backend;
+package com.wudaokou.backend.login;
 
 import lombok.Getter;
 import lombok.Setter;
