@@ -8,6 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.groups.Default;
+import java.util.Set;
 
 
 class Constants {
@@ -35,6 +36,11 @@ public class User {
 
     @Column(unique = true)
     private String token;
+
+    @OneToMany(mappedBy = "user")
+    private Set<SearchHistory> searchHistory;
+    @OneToMany(mappedBy = "user")
+    private Set<ViewHistory> viewHistory;
 }
 
 interface CheckInfo{}
