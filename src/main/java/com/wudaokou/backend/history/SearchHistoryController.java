@@ -1,4 +1,4 @@
-package com.wudaokou.backend;
+package com.wudaokou.backend.history;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

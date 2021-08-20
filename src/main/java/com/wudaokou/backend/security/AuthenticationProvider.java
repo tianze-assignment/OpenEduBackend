@@ -1,5 +1,7 @@
-package com.wudaokou.backend;
+package com.wudaokou.backend.security;
 
+import com.wudaokou.backend.login.Customer;
+import com.wudaokou.backend.login.CustomerRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
