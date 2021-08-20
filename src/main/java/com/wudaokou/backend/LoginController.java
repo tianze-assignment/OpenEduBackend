@@ -1,15 +1,22 @@
 package com.wudaokou.backend;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -84,6 +91,14 @@ public class LoginController {
         return sb.toString();
     }
 
+    String generateToken(int length) {
+        String token;
+        do{
+            token = randomString(length);
+        }while(userRepository.existsByToken(token));
+        return token;
+    }
+
     @PostMapping("/register")
     ResponseEntity<?> register(@Valid @RequestBody User user) {
         if( userExists(user) ){
@@ -93,7 +108,7 @@ public class LoginController {
         String hashedPassword = hashPassword(user.getPassword());
 
         // generate token
-        String token = randomString(64);
+        String token = generateToken(64);
 
         // store to db
         user.setPassword(hashedPassword);
@@ -120,7 +135,7 @@ public class LoginController {
             return new ResponseEntity<>("Wrong password", HttpStatus.NOT_ACCEPTABLE);
 
         // generate token
-        String token = randomString(64);
+        String token = generateToken(64);
 
         // store to db
         realUser.setToken(token);
@@ -131,4 +146,44 @@ public class LoginController {
         ));
     }
 
+    @PutMapping("/changePassword")
+    ResponseEntity<?> changePassword(@Valid @RequestBody changePasswordParams user){
+        Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
+        if(dbUser.isEmpty())
+            return new ResponseEntity<>("User does not exist", HttpStatus.NOT_FOUND);
+        User realUser = dbUser.get();
+
+        // validate old password
+        String hashedOldPassword = hashPassword(user.getOldPassword());
+        if(!hashedOldPassword.equals(realUser.getPassword()))
+            return new ResponseEntity<>("Wrong password", HttpStatus.NOT_ACCEPTABLE);
+
+        // store new password
+        String hashedNewPassword = hashPassword(user.getNewPassword());
+        realUser.setPassword(hashedNewPassword);
+        userRepository.save(realUser);
+
+        return ResponseEntity.ok("Changed password successfully");
+    }
+
 }
+
+@Getter
+@Setter
+class changePasswordParams{
+    @Pattern(regexp = Constants.USERNAME_REGEX)
+    @NotNull
+    private String username;
+
+    @NotNull
+    @NotEmpty
+    @NotBlank
+    private String oldPassword;
+
+    @NotNull
+    @NotEmpty
+    @NotBlank
+    private String newPassword;
+}
+
+

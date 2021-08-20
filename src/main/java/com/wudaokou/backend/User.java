@@ -9,6 +9,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.groups.Default;
 
+
+class Constants {
+    public static final String USERNAME_REGEX = "^[0-9a-zA-Z_]+$";
+}
+
 @Getter
 @Setter
 @Entity
@@ -17,7 +22,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Pattern(regexp = "^[0-9a-zA-Z_]+$", groups = {CheckInfo.class, Default.class})
+    @Pattern(regexp = Constants.USERNAME_REGEX, groups = {CheckInfo.class, Default.class})
     @NotNull(groups = {CheckInfo.class, Default.class})
     @Column(nullable = false, unique = true)
     private String username;
@@ -28,6 +33,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(unique = true)
     private String token;
 }
 
