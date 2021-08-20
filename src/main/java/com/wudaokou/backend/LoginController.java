@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class LoginController {
@@ -25,13 +26,6 @@ public class LoginController {
         this.userRepository = userRepository;
         this.salt = "fifthStreet".getBytes();
     }
-
-//    @PostMapping("/login")
-//    ResponseEntity<String> login(@RequestBody User user){
-//
-//    }
-
-//    @PostMapping("/register")
 
     Boolean userExists(User user){
         return userRepository.existsByUsername(user.getUsername());
@@ -105,6 +99,32 @@ public class LoginController {
         user.setPassword(hashedPassword);
         user.setToken(token);
         userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of(
+                "token", token
+        ));
+    }
+
+    @PostMapping("/login")
+    ResponseEntity<?> login(@Valid @RequestBody User user) {
+        Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
+        if(dbUser.isEmpty())
+            return new ResponseEntity<>("User does not exist", HttpStatus.NOT_FOUND);
+        User realUser = dbUser.get();
+
+        // hash password
+        String hashedPassword = hashPassword(user.getPassword());
+
+        // validate
+        if(!hashedPassword.equals(realUser.getPassword()))
+            return new ResponseEntity<>("Wrong password", HttpStatus.NOT_ACCEPTABLE);
+
+        // generate token
+        String token = randomString(64);
+
+        // store to db
+        realUser.setToken(token);
+        userRepository.save(realUser);
 
         return ResponseEntity.ok(Map.of(
                 "token", token
