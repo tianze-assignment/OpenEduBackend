@@ -8,6 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.groups.Default;
+import java.util.Set;
 
 
 class Constants {
@@ -17,7 +18,7 @@ class Constants {
 @Getter
 @Setter
 @Entity
-public class User {
+public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -35,6 +36,11 @@ public class User {
 
     @Column(unique = true)
     private String token;
+
+    @OneToMany(mappedBy = "customer")
+    private Set<SearchHistory> searchHistory;
+    @OneToMany(mappedBy = "customer")
+    private Set<ViewHistory> viewHistory;
 }
 
 interface CheckInfo{}

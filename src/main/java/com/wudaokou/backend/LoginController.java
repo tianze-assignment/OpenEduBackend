@@ -26,22 +26,22 @@ import java.util.Optional;
 @RestController
 public class LoginController {
 
-    private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
     private final byte[] salt;
 
-    public LoginController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public LoginController(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.salt = "fifthStreet".getBytes();
     }
 
-    Boolean userExists(User user){
-        return userRepository.existsByUsername(user.getUsername());
+    Boolean userExists(Customer customer){
+        return customerRepository.existsByUsername(customer.getUsername());
     }
 
     @PostMapping("/checkUsername")
-    ResponseEntity<?> checkUsername(@Validated(CheckInfo.class) @RequestBody User user){
+    ResponseEntity<?> checkUsername(@Validated(CheckInfo.class) @RequestBody Customer customer){
         return ResponseEntity.ok(Map.of(
-                "valid", !userExists(user)
+                "valid", !userExists(customer)
         ));
     }
 
@@ -95,25 +95,25 @@ public class LoginController {
         String token;
         do{
             token = randomString(length);
-        }while(userRepository.existsByToken(token));
+        }while(customerRepository.existsByToken(token));
         return token;
     }
 
     @PostMapping("/register")
-    ResponseEntity<?> register(@Valid @RequestBody User user) {
-        if( userExists(user) ){
+    ResponseEntity<?> register(@Valid @RequestBody Customer customer) {
+        if( userExists(customer) ){
             return new ResponseEntity<>("User already exists", HttpStatus.CONFLICT);
         }
         // hash password
-        String hashedPassword = hashPassword(user.getPassword());
+        String hashedPassword = hashPassword(customer.getPassword());
 
         // generate token
         String token = generateToken(64);
 
         // store to db
-        user.setPassword(hashedPassword);
-        user.setToken(token);
-        userRepository.save(user);
+        customer.setPassword(hashedPassword);
+        customer.setToken(token);
+        customerRepository.save(customer);
 
         return ResponseEntity.ok(Map.of(
                 "token", token
@@ -121,25 +121,25 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<?> login(@Valid @RequestBody User user) {
-        Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
+    ResponseEntity<?> login(@Valid @RequestBody Customer customer) {
+        Optional<Customer> dbUser = customerRepository.findByUsername(customer.getUsername());
         if(dbUser.isEmpty())
             return new ResponseEntity<>("User does not exist", HttpStatus.NOT_FOUND);
-        User realUser = dbUser.get();
+        Customer realCustomer = dbUser.get();
 
         // hash password
-        String hashedPassword = hashPassword(user.getPassword());
+        String hashedPassword = hashPassword(customer.getPassword());
 
         // validate
-        if(!hashedPassword.equals(realUser.getPassword()))
+        if(!hashedPassword.equals(realCustomer.getPassword()))
             return new ResponseEntity<>("Wrong password", HttpStatus.NOT_ACCEPTABLE);
 
         // generate token
         String token = generateToken(64);
 
         // store to db
-        realUser.setToken(token);
-        userRepository.save(realUser);
+        realCustomer.setToken(token);
+        customerRepository.save(realCustomer);
 
         return ResponseEntity.ok(Map.of(
                 "token", token
@@ -148,20 +148,20 @@ public class LoginController {
 
     @PutMapping("/changePassword")
     ResponseEntity<?> changePassword(@Valid @RequestBody changePasswordParams user){
-        Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
+        Optional<Customer> dbUser = customerRepository.findByUsername(user.getUsername());
         if(dbUser.isEmpty())
             return new ResponseEntity<>("User does not exist", HttpStatus.NOT_FOUND);
-        User realUser = dbUser.get();
+        Customer realCustomer = dbUser.get();
 
         // validate old password
         String hashedOldPassword = hashPassword(user.getOldPassword());
-        if(!hashedOldPassword.equals(realUser.getPassword()))
+        if(!hashedOldPassword.equals(realCustomer.getPassword()))
             return new ResponseEntity<>("Wrong password", HttpStatus.NOT_ACCEPTABLE);
 
         // store new password
         String hashedNewPassword = hashPassword(user.getNewPassword());
-        realUser.setPassword(hashedNewPassword);
-        userRepository.save(realUser);
+        realCustomer.setPassword(hashedNewPassword);
+        customerRepository.save(realCustomer);
 
         return ResponseEntity.ok("Changed password successfully");
     }
