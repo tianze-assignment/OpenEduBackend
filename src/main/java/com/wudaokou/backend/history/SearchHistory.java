@@ -23,6 +23,7 @@ public class SearchHistory {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     @NotNull
     private String searchKey;
 }
