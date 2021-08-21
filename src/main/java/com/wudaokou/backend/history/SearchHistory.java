@@ -3,12 +3,13 @@ package com.wudaokou.backend.history;
 import com.wudaokou.backend.login.Customer;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Getter @Setter
 @Entity
 public class SearchHistory {
     @Id
@@ -18,6 +19,10 @@ public class SearchHistory {
     @ManyToOne
     private Customer customer;
 
-    @Column(columnDefinition = "TIMESTAMP")
-    private LocalDateTime localDateTime;
+    @Column(columnDefinition = "TIMESTAMP", updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @NotNull
+    private String searchKey;
 }
