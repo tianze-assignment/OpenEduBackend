@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter @Setter
 @Entity
@@ -26,4 +27,11 @@ public class SearchHistory {
     @Column(nullable = false)
     @NotNull
     private String searchKey;
+
+    public Map<?, ?> toMap(){
+        return Map.of(
+                "searchKey", searchKey,
+                "createAt", createdAt
+        );
+    }
 }
