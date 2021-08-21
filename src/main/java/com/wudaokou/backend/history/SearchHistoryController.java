@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 public class SearchHistoryController {
     private final SearchHistoryRepository searchHistoryRepository;
@@ -17,7 +19,7 @@ public class SearchHistoryController {
     }
 
     @PostMapping ("/api/history/search")
-    ResponseEntity<?> test(@RequestBody SearchHistory searchHistory){
+    ResponseEntity<?> post(@Valid @RequestBody SearchHistory searchHistory){
         searchHistory.setCustomer(securityRelated.getCustomer());
         searchHistoryRepository.save(searchHistory);
         return ResponseEntity.ok("ok");
