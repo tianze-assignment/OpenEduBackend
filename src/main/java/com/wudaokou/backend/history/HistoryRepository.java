@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Integer> {
-    List<SearchHistory> findAllByCustomer(Customer customer, Pageable pageable);
+public interface HistoryRepository extends JpaRepository<History, Integer> {
+    List<History> findAllByCustomerAndCourse(Customer customer, Course course, Pageable pageable);
 }
