@@ -1,5 +1,6 @@
 package com.wudaokou.backend;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,5 +26,19 @@ public class ExceptionAdvice {
             errors.put(fieldName, errorMessage);
         });
         return errors;
+    }
+
+    @ResponseBody
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleValidationExceptions(IllegalArgumentException ex){
+        return ex.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(InvalidFormatException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleJsonInvalidFormatException(InvalidFormatException ex){
+        return ex.getOriginalMessage();
     }
 }

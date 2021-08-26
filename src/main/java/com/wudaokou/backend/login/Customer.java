@@ -1,7 +1,5 @@
 package com.wudaokou.backend.login;
 
-import com.wudaokou.backend.history.SearchHistory;
-import com.wudaokou.backend.history.ViewHistory;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,7 +8,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.groups.Default;
-import java.util.Set;
 
 
 class Constants {
@@ -38,11 +35,6 @@ public class Customer {
 
     @Column(unique = true)
     private String token;
-
-    @OneToMany(mappedBy = "customer")
-    private Set<SearchHistory> searchHistory;
-    @OneToMany(mappedBy = "customer")
-    private Set<ViewHistory> viewHistory;
 }
 
 interface CheckInfo{}
