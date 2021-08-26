@@ -5,4 +5,5 @@ public enum HistoryType {
     info,  // 实体详情
     question, // 问答
     link, // 实体链接
+    star, // 收藏
 }
