@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class History {
-    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -23,7 +22,6 @@ public class History {
     @ManyToOne
     private Customer customer;
 
-    @Column(columnDefinition = "TIMESTAMP", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 

@@ -1,0 +1,32 @@
+POST http://localhost:6789/checkUsername
+Content-Type: application/json
+
+{
+  "username": "leo"
+}
+
+###
+
+POST http://localhost:6789/api/history/search
+Content-Type: application/json
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+{
+  "course": "CHINESE",
+  "name": "滕王阁序"
+}
+###
+
+POST http://localhost:6789/api/history/info
+Content-Type: application/json
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+{
+  "course": "CHINESE",
+  "name": "《长恨歌》",
+  "uri": "http://edukb.org/knowledge/0.1/instance/chinese#-0bc107e349fc3d4b6a1fbde652727666"
+}
+###
+
+GET http://localhost:6789/api/history
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma

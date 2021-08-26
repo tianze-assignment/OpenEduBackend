@@ -1,7 +1,9 @@
 package com.wudaokou.backend.history;
 
+import com.wudaokou.backend.login.Customer;
 import com.wudaokou.backend.login.SecurityRelated;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,20 +21,27 @@ public class HistoryController {
         this.securityRelated = securityRelated;
     }
 
-    @PostMapping("/api/history/search")
-    public ResponseEntity<?> postSearchHistory(@Valid @RequestBody History history){
-        history.setType(HistoryType.SEARCH);
+    @PostMapping("/api/history/{type}")
+    History postSearchHistory(@Valid @RequestBody History history,
+                                               @PathVariable HistoryType type){
+        history.setType(type);
         history.setCustomer(securityRelated.getCustomer());
-        historyRepository.save(history);
-        return ResponseEntity.ok("ok");
+        return historyRepository.save(history);
     }
 
-    @GetMapping("/api/history/search")
-    List<?> get(@RequestParam int page, @RequestParam int size, @RequestParam Course course){
-        return historyRepository.findAllByCustomerAndCourse(
-                securityRelated.getCustomer(),
-                course,
-                PageRequest.of(page, size, Sort.by("createdAt").descending())
-        );
+    @GetMapping(value = {"/api/history", "/api/history/{type}"})
+    List<?> get(@PathVariable(required = false) HistoryType type){
+        Customer customer = securityRelated.getCustomer();
+        Sort sort = Sort.by("createdAt").descending();
+        // @RequestParam(required = false) int page, @RequestParam(required = false) int size
+        // Pageable pageable = PageRequest.of(page, size, sort);
+        if(type == null)
+            return historyRepository.findAllByCustomer(customer, sort);
+        return historyRepository.findAllByCustomerAndType(customer, type, sort);
+    }
+
+    @DeleteMapping("/api/history/{id}")
+    void delete(@PathVariable int id){
+        historyRepository.deleteById(id);
     }
 }
