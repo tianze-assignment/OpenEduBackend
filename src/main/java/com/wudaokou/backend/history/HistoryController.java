@@ -3,10 +3,13 @@ package com.wudaokou.backend.history;
 import com.wudaokou.backend.login.Customer;
 import com.wudaokou.backend.login.SecurityRelated;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
 
 @RestController
 public class HistoryController {
@@ -46,8 +49,21 @@ public class HistoryController {
         return historyRepository.findAllByCustomerAndType(customer, type, sort);
     }
 
-    @DeleteMapping("/api/history/{id}")
-    void delete(@PathVariable int id){
-        historyRepository.deleteById(id);
+    @DeleteMapping("/api/history/{s}")
+    ResponseEntity<?> delete(@PathVariable String s){
+        try {
+            int id = Integer.parseInt(s);
+            historyRepository.deleteById(id);
+        }catch(NumberFormatException nfe){
+            try{
+                Customer customer = securityRelated.getCustomer();
+                HistoryType type = HistoryType.valueOf(s);
+                historyRepository.deleteByCustomerAndType(customer, type);
+            }catch(IllegalArgumentException iae){
+                return ResponseEntity.badRequest().body("Illegal type: " + s);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }
