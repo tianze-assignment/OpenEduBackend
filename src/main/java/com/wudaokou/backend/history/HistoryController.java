@@ -2,10 +2,7 @@ package com.wudaokou.backend.history;
 
 import com.wudaokou.backend.login.Customer;
 import com.wudaokou.backend.login.SecurityRelated;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,17 +13,26 @@ public class HistoryController {
     private final HistoryRepository historyRepository;
     private final SecurityRelated securityRelated;
 
+    private final int MAX_SEARCH_HISTORY_SIZE = 10;
+
     public HistoryController(HistoryRepository historyRepository, SecurityRelated securityRelated) {
         this.historyRepository = historyRepository;
         this.securityRelated = securityRelated;
     }
 
     @PostMapping("/api/history/{type}")
-    History postSearchHistory(@Valid @RequestBody History history,
+    List<History> postSearchHistory(@Valid @RequestBody History history,
                                                @PathVariable HistoryType type){
         history.setType(type);
-        history.setCustomer(securityRelated.getCustomer());
-        return historyRepository.save(history);
+        Customer customer = securityRelated.getCustomer();
+        history.setCustomer(customer);
+        historyRepository.save(history);
+        List<History> list = historyRepository.findAllByCustomerAndType(customer, type, Sort.by("createdAt").descending());
+        if(type == HistoryType.search){
+            while(list.size() > MAX_SEARCH_HISTORY_SIZE)
+                historyRepository.deleteById( list.remove(MAX_SEARCH_HISTORY_SIZE).getId() );
+        }
+        return list;
     }
 
     @GetMapping(value = {"/api/history", "/api/history/{type}"})
