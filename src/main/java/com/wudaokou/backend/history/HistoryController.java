@@ -24,17 +24,17 @@ public class HistoryController {
     }
 
     @PostMapping("/api/history/{type}")
-    List<History> postSearchHistory(@Valid @RequestBody History history,
+    Object postSearchHistory(@Valid @RequestBody History history,
                                                @PathVariable HistoryType type){
         history.setType(type);
         Customer customer = securityRelated.getCustomer();
         history.setCustomer(customer);
-        historyRepository.save(history);
+        History ret = historyRepository.save(history);
+        if(type != HistoryType.search)
+            return ret;
         List<History> list = historyRepository.findAllByCustomerAndType(customer, type, Sort.by("createdAt").descending());
-        if(type == HistoryType.search){
-            while(list.size() > MAX_SEARCH_HISTORY_SIZE)
-                historyRepository.deleteById( list.remove(MAX_SEARCH_HISTORY_SIZE).getId() );
-        }
+        while(list.size() > MAX_SEARCH_HISTORY_SIZE)
+            historyRepository.deleteById( list.remove(MAX_SEARCH_HISTORY_SIZE).getId() );
         return list;
     }
 
