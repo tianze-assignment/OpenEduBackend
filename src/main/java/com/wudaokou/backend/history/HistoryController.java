@@ -63,7 +63,7 @@ public class HistoryController {
                 return ResponseEntity.badRequest().body("Illegal type: " + s);
             }
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(new History());
     }
 
 }
