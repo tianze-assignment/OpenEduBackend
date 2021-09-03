@@ -28,4 +28,10 @@ public class UserQuestion {
     public UserQuestion() {
 
     }
+
+    public double recommendationValue(){
+        double starValue = hasStar ? 0.5 : 0;
+        double wrongRatio = (double) wrongCount / (double) totalCount;
+        return starValue + wrongRatio;
+    }
 }

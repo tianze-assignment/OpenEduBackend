@@ -1,20 +1,24 @@
 package com.wudaokou.backend.question;
 
 import com.wudaokou.backend.history.Course;
+import com.wudaokou.backend.history.HistoryRepository;
 import com.wudaokou.backend.login.Customer;
 import com.wudaokou.backend.login.SecurityRelated;
+import com.wudaokou.backend.question.recommend.Recommend;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class QuestionController {
+    private final HistoryRepository historyRepository;
     private final QuestionRepository questionRepository;
     private final UserQuestionRepository userQuestionRepository;
     private final SecurityRelated securityRelated;
 
 
-    public QuestionController(QuestionRepository questionRepository, UserQuestionRepository userQuestionRepository, SecurityRelated securityRelated) {
+    public QuestionController(HistoryRepository historyRepository, QuestionRepository questionRepository, UserQuestionRepository userQuestionRepository, SecurityRelated securityRelated) {
+        this.historyRepository = historyRepository;
         this.questionRepository = questionRepository;
         this.userQuestionRepository = userQuestionRepository;
         this.securityRelated = securityRelated;
@@ -72,6 +76,20 @@ public class QuestionController {
             userQuestionRepository.save(userQuestion);
         }
         return "ok";
+    }
+
+    @GetMapping("/api/question/recommend")
+    Object recommend(@RequestParam Course course,
+                     @RequestParam int number,
+                     @RequestParam String openEduId){
+//        Logger logger = LoggerFactory.getLogger(QuestionController.class);
+        return new Recommend(openEduId).recommend(
+                securityRelated.getCustomer(),
+                course,
+                number,
+                userQuestionRepository,
+                historyRepository
+        );
     }
 
 }
