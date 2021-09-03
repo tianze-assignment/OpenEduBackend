@@ -1,12 +1,14 @@
 package com.wudaokou.backend.question;
 
 import com.wudaokou.backend.login.Customer;
+import lombok.Getter;
 
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
 @Embeddable
 public class UserQuestionId implements Serializable {
     @ManyToOne

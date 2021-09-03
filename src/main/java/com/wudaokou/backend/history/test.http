@@ -12,21 +12,44 @@ Content-Type: application/json
 Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
 
 {
-  "course": "CHINESE",
-  "name": "滕王阁序"
+  "course": "MATH",
+  "name": "阿斯利康家"
 }
 ###
 
-POST http://localhost:6789/api/history/info
+POST http://localhost:6789/api/history/search
 Content-Type: application/json
 Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
 
 {
   "course": "CHINESE",
-  "name": "《长恨歌》",
+  "name": "asd",
   "uri": "http://edukb.org/knowledge/0.1/instance/chinese#-0bc107e349fc3d4b6a1fbde652727666"
 }
 ###
 
 GET http://localhost:6789/api/history
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+###
+DELETE http://tianze.site:6789/api/history/55
+Content-Type: application/json
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+###
+PUT http://localhost:6789/api/question/count
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+id=53423&wrong=true&qAnswer=a&qBody=b&label=asdjoijf&course=MATH
+
+###
+PUT http://localhost:6789/api/question/star
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+id=53423&starOrUnstar=true&label=asdjoijf&course=MATH
+
+###
+GET http://localhost:6789/api/question/recommend?course=GEO&openEduId=asdio
 Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
