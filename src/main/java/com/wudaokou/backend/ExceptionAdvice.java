@@ -4,18 +4,15 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class ExceptionAdvice {
 
-    @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex){
@@ -28,17 +25,21 @@ public class ExceptionAdvice {
         return errors;
     }
 
-    @ResponseBody
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleValidationExceptions(IllegalArgumentException ex){
         return ex.getMessage();
     }
 
-    @ResponseBody
     @ExceptionHandler(InvalidFormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleJsonInvalidFormatException(InvalidFormatException ex){
         return ex.getOriginalMessage();
+    }
+
+    @ExceptionHandler(WebClientResponseException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleOpenEduServerError(WebClientResponseException ex){
+        return "OpenEduError:\n" + ex.getMessage();
     }
 }

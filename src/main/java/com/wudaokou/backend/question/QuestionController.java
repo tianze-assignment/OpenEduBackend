@@ -4,7 +4,7 @@ import com.wudaokou.backend.history.Course;
 import com.wudaokou.backend.history.HistoryRepository;
 import com.wudaokou.backend.login.Customer;
 import com.wudaokou.backend.login.SecurityRelated;
-import org.springframework.data.domain.PageRequest;
+import com.wudaokou.backend.question.recommend.Recommend;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -79,46 +79,15 @@ public class QuestionController {
     }
 
     @GetMapping("/api/question/recommend")
-    List<?> recommend(@RequestParam Course course,
+    Object recommend(@RequestParam Course course,
                              @RequestParam String openEduId){
-        List<Question> questions = new LinkedList<>();
-        List<String> labels = new LinkedList<>();
-        // 1个错题，1个易错知识点，2个高频访问知识点，1个随机知识点
-        final int totalCount = 5;
-        final int wrongQuestionCount = 1;
-        final int wrongEntityCount = 1;
-        final int frequentEntityCount = 2;
-        final int randomEntityCount = totalCount - wrongQuestionCount - wrongEntityCount - frequentEntityCount;
-        final String[] randomNames = SubjectKeywords.getMap().get(course);
-
-        Customer customer = securityRelated.getCustomer();
-        List<UserQuestion> userQuestions = userQuestionRepository.findByUserQuestionId_CustomerAndUserQuestionId_Question_Course(customer, course);
-        userQuestions.sort(Comparator.comparingDouble(UserQuestion::recommendationValue));
-        if( ! userQuestions.isEmpty() ) {
-            questions.add(userQuestions.get(0).getUserQuestionId().getQuestion());  // 1个错题
-            labels.add(questions.get(0).getLabel());  // 1个易错知识点
-        }
-
-        // 高频知识点
-        List<String> topFrequentNamesOfEntity = historyRepository.findTopFrequentNameOfEntity(customer, course, PageRequest.of(0, 4));
-        while( !topFrequentNamesOfEntity.isEmpty() &&
-                labels.size() < wrongEntityCount + frequentEntityCount + (questions.isEmpty() ? 1 : 0) ){
-            labels.add(topFrequentNamesOfEntity.remove(0));
-        }
-
-        // 随机知识点
-        Random rand = new Random();
-        while(labels.size() < totalCount - (questions.isEmpty() ? 0 : 1)){
-            String label = randomNames[rand.nextInt(randomNames.length)];
-            if(!labels.contains(label))
-                labels.add(label);
-        }
-
-        // 请求
-        String baseUrl = "http://open.edukg.cn/opedukg/api/typeOpen/open/questionListByUriName";
-
-
-        return questions;
+//        Logger logger = LoggerFactory.getLogger(QuestionController.class);
+        return new Recommend(openEduId).recommend(
+                securityRelated.getCustomer(),
+                course,
+                userQuestionRepository,
+                historyRepository
+        );
     }
 
 }

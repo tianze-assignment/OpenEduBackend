@@ -1,5 +1,6 @@
 package com.wudaokou.backend.question;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wudaokou.backend.history.Course;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +17,10 @@ public class Question {
     @Id
     private Integer id;
 
+    @JsonProperty("qAnswer")
     private String qAnswer;
 
+    @JsonProperty("qBody")
     private String qBody;
 
     private String label;
