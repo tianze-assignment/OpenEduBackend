@@ -3,11 +3,11 @@ package com.wudaokou.backend.question.recommend;
 import com.wudaokou.backend.history.Course;
 import com.wudaokou.backend.history.HistoryRepository;
 import com.wudaokou.backend.login.Customer;
-import com.wudaokou.backend.question.Question;
-import com.wudaokou.backend.question.SubjectKeywords;
-import com.wudaokou.backend.question.UserQuestion;
-import com.wudaokou.backend.question.UserQuestionRepository;
+import com.wudaokou.backend.question.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
@@ -16,6 +16,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Recommend {
     WebClient webClient = WebClient.create("http://open.edukg.cn/opedukg/api/typeOpen/open/questionListByUriName");
@@ -28,69 +29,78 @@ public class Recommend {
 
     public List<Question> recommend(Customer customer,
                                     Course course,
+                                    final int totalCount,
                                     UserQuestionRepository userQuestionRepository,
                                     HistoryRepository historyRepository){
         List<Question> questions = new LinkedList<>();
         List<String> labels = new LinkedList<>();
         // 1个错题，1个易错知识点，2个高频访问知识点，1个随机知识点
-        final int totalCount = 5;
-        final int wrongQuestionCount = 1;
-        final int wrongEntityCount = 1;
-        final int frequentEntityCount = 2;
-        final int randomEntityCount = totalCount - wrongQuestionCount - wrongEntityCount - frequentEntityCount;
-        final String[] randomNames = SubjectKeywords.getMap().get(course);
+        final int wrongQuestionCount = (int) (totalCount * 0.2);  // 错题
+        final int wrongEntityCount = (int) (totalCount * 0.2);  // 易错知识点
+        final int frequentEntityCount = (int) (totalCount * 0.4);  // 高频访问知识点
 
+        // 错题
         List<UserQuestion> userQuestions = userQuestionRepository
                 .findByUserQuestionId_CustomerAndUserQuestionId_Question_Course(customer, course);
-        userQuestions.sort(Comparator.comparingDouble(UserQuestion::recommendationValue));
-        if( ! userQuestions.isEmpty() ) {
-            questions.add(userQuestions.get(0).getUserQuestionId().getQuestion());  // 1个错题
-            labels.add(questions.get(0).getLabel());  // 1个易错知识点
-        }
+        userQuestions.sort(Comparator.comparingDouble(UserQuestion::recommendationValue).reversed()); //倒序
+
+        for(int i = 0; i < wrongQuestionCount && i < userQuestions.size(); i++)
+            questions.add(userQuestions.get(i).getUserQuestionId().getQuestion());
+
+        // 易错知识点
+        for(int i = 0; i < wrongEntityCount && i < userQuestions.size(); i++)
+            labels.add(userQuestions.get(i).getUserQuestionId().getQuestion().getLabel());
 
         // 高频知识点
         List<String> topFrequentNamesOfEntity = historyRepository
-                .findTopFrequentNameOfEntity(customer, course, PageRequest.of(0, 4));
+                .findTopFrequentNameOfEntity(customer, course,
+                        PageRequest.of(0, wrongQuestionCount + wrongEntityCount + frequentEntityCount));
         while( !topFrequentNamesOfEntity.isEmpty() &&
-                labels.size() < wrongEntityCount + frequentEntityCount + (questions.isEmpty() ? 1 : 0) ){
+                questions.size() + labels.size() < wrongQuestionCount + wrongEntityCount + frequentEntityCount)
             labels.add(topFrequentNamesOfEntity.remove(0));
-        }
 
         // 随机知识点
+        final String[] randomNames = SubjectKeywords.getMap().get(course);
         Random rand = new Random();
-        while(labels.size() < totalCount - (questions.isEmpty() ? 0 : 1)){
+        while(labels.size() < totalCount - questions.size()){
             String label = randomNames[rand.nextInt(randomNames.length)];
             if(!labels.contains(label))
                 labels.add(label);
         }
 
+//        Logger logger = LoggerFactory.getLogger(QuestionController.class);
+//        logger.info("labels: "+ labels);
+
         // 请求
         List<QuestionResponse> responses = fetchQuestions(labels, course).collectList().block();
 
         assert responses != null;
-        for(int i = 0; i < responses.size(); i++){
-            List<Question> qs = responses.get(i).getData();
-            if(qs == null)
+
+//        for(QuestionResponse o : responses)
+//            logger.info("response: "+o.getData().toString());
+
+        for (QuestionResponse res : responses) {
+            List<Question> qs = res.getData();
+            if (qs == null)
                 throw new WebClientResponseException("OpenEdu Not Logged In", 500, "Server Error", null, null, null);
-            if(qs.isEmpty()){
-                if(i != responses.size() - 1) continue;
-                // if the last one is empty
-                // size of responses won't be less than 2 unless labels is less than 2
-                for(int j = responses.size() - 2; j >= 0 && questions.size() < totalCount; j--){
-                    List<Question> qsBackward = responses.get(j).getData();
-                    for(Question qBackward : qsBackward){
-                        if(questions.size() == totalCount) break;
-                        if(containsQuestion(questions, qBackward)) continue;
-                        questions.add(qBackward);
-                    }
-                }
-                break;
-            }
+            if (qs.isEmpty()) continue;
             Question q;
             do {
                 q = qs.get(rand.nextInt(qs.size()));
-            }while(containsQuestion(questions, q));
+            } while (containsQuestion(questions, q));
             questions.add(q);
+//            logger.info("added " + q.toString());
+        }
+
+        for(int j = responses.size() - 1; j >= 0 && questions.size() < totalCount; j--){
+            List<Question> qsBackward = new ArrayList<>(responses.get(j).getData());
+            Collections.shuffle(qsBackward);
+            for(Question qBackward : qsBackward){
+                if(questions.size() == totalCount) break;
+                if(containsQuestion(questions, qBackward)) continue;
+                questions.add(qBackward);
+//                logger.info("last label added " + qBackward.toString());
+            }
         }
 
         Collections.shuffle(questions);
@@ -103,11 +113,11 @@ public class Recommend {
         return false;
     }
 
-    public Mono<QuestionResponse> getQuestion(String name, Course course){
+    public Mono<QuestionResponse> getQuestion(Pair<Integer, String> indexedName, Course course){
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("id", openEduId)
-                        .queryParam("uriName", name)
+                        .queryParam("uriName", indexedName.getSecond())
                         .build())
                 .retrieve()
                 .bodyToMono(QuestionResponse.class)
@@ -115,20 +125,25 @@ public class Recommend {
                     qr.setData(
                             qr.getData().stream().peek(
                                     q -> {
-                                        q.setLabel(name);
+                                        q.setLabel(indexedName.getSecond());
                                         q.setCourse(course);
                                     }
                             ).collect(Collectors.toList())
                     );
+                    qr.setIndex(indexedName.getFirst());
                     return qr;
                 });
     }
 
     public Flux<QuestionResponse> fetchQuestions(List<String> names, Course course){
-        return Flux.fromIterable(names)
+        List<Pair<Integer, String>> indexedNames = IntStream.range(0, names.size())
+                .mapToObj(i -> Pair.of(i, names.get(i)))
+                .collect(Collectors.toList());
+
+        return Flux.fromIterable(indexedNames)
                 .parallel()
                 .runOn(Schedulers.boundedElastic())
                 .flatMap(name -> getQuestion(name, course))
-                .sequential();
+                .ordered(Comparator.comparingInt(QuestionResponse::getIndex));
     }
 }

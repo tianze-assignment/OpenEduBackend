@@ -80,11 +80,13 @@ public class QuestionController {
 
     @GetMapping("/api/question/recommend")
     Object recommend(@RequestParam Course course,
-                             @RequestParam String openEduId){
+                     @RequestParam int number,
+                     @RequestParam String openEduId){
 //        Logger logger = LoggerFactory.getLogger(QuestionController.class);
         return new Recommend(openEduId).recommend(
                 securityRelated.getCustomer(),
                 course,
+                number,
                 userQuestionRepository,
                 historyRepository
         );

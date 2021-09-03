@@ -48,4 +48,14 @@ public class Question {
         return Objects.equals(id, question.id);
     }
 
+//    @Override
+//    public String toString() {
+//        return "Question{" +
+//                "id=" + id +
+//                ", qAnswer='" + qAnswer + '\'' +
+//                ", qBody='" + qBody + '\'' +
+//                ", label='" + label + '\'' +
+//                ", course=" + course +
+//                '}';
+//    }
 }
