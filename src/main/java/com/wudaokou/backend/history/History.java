@@ -42,4 +42,6 @@ public class History {
 
     private String category;
 
+    private String searchKey;
+
 }
