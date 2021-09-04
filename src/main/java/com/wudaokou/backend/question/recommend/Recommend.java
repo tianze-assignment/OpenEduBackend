@@ -45,7 +45,7 @@ public class Recommend {
         userQuestions.sort(Comparator.comparingDouble(UserQuestion::recommendationValue).reversed()); //倒序
 
         for(int i = 0; i < wrongQuestionCount && i < userQuestions.size(); i++)
-            questions.add(userQuestions.get(i).getUserQuestionId().getQuestion());
+            addIfValid(questions, userQuestions.get(i).getUserQuestionId().getQuestion());
 
         // 易错知识点
         for(int i = 0; i < wrongEntityCount && i < userQuestions.size(); i++)
@@ -76,7 +76,7 @@ public class Recommend {
 
         assert responses != null;
 
-//        for(QuestionResponse o : responses)
+        for(QuestionResponse o : responses)
 //            logger.info("response: "+o.getData().toString());
 
         for (QuestionResponse res : responses) {
@@ -88,7 +88,7 @@ public class Recommend {
             do {
                 q = qs.get(rand.nextInt(qs.size()));
             } while (containsQuestion(questions, q));
-            questions.add(q);
+            addIfValid(questions, q);
 //            logger.info("added " + q.toString());
         }
 
@@ -98,7 +98,7 @@ public class Recommend {
             for(Question qBackward : qsBackward){
                 if(questions.size() == totalCount) break;
                 if(containsQuestion(questions, qBackward)) continue;
-                questions.add(qBackward);
+                addIfValid(questions, qBackward);
 //                logger.info("last label added " + qBackward.toString());
             }
         }
@@ -111,6 +111,17 @@ public class Recommend {
         for(Question q : questions)
             if(Objects.equals(q.getId(), question.getId())) return true;
         return false;
+    }
+
+    private void addIfValid(List<Question> questions, Question question){
+        String answer = question.getQAnswer();
+        String body = question.getQBody();
+        if(answer.isEmpty() || body.isEmpty()) return;
+        if(answer.startsWith("答案"))
+            answer = answer.replaceFirst("答案", "");
+        if(!List.of("A", "B", "C", "D").contains(answer)) return;
+        question.setQAnswer(answer);
+        questions.add(question);
     }
 
     public Mono<QuestionResponse> getQuestion(Pair<Integer, String> indexedName, Course course){
