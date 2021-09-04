@@ -53,3 +53,7 @@ id=53423&starOrUnstar=true&label=asdjoijf&course=MATH
 ###
 GET http://localhost:6789/api/question/recommend?course=GEO&number=5&openEduId=ece5defa-9680-4b75-b993-fb611bfd17dd
 Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+###
+GET http://localhost:6789/api/question/star
+Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma

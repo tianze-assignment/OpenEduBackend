@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserQuestionRepository extends JpaRepository<UserQuestion, Integer> {
     Optional<UserQuestion> findByUserQuestionId(UserQuestionId userQuestionId);
     List<UserQuestion> findByUserQuestionId_CustomerAndUserQuestionId_Question_Course(Customer customer, Course course);
+    List<UserQuestion> findByUserQuestionId_CustomerAndHasStar(Customer customer, boolean hasStar);
 }

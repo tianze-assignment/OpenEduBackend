@@ -8,6 +8,7 @@ import com.wudaokou.backend.question.recommend.Recommend;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class QuestionController {
@@ -32,16 +33,7 @@ public class QuestionController {
                         @RequestParam String label,
                         @RequestParam Course course){
         Customer customer = securityRelated.getCustomer();
-        Question question = questionRepository.findById(id).map(
-                (q) -> {
-                    if(q.getQBody().isEmpty() || q.getQAnswer().isEmpty()){
-                        q.setQAnswer(qAnswer);
-                        q.setQBody(qBody);
-                        return questionRepository.save(q);
-                    }
-                    return q;
-                }
-        ).orElseGet(
+        Question question = questionRepository.findById(id).orElseGet(
                 () -> questionRepository.save(new Question(id, qAnswer, qBody, label, course))
         );
         int wrongCount = wrong ? 1 : 0;
@@ -61,11 +53,13 @@ public class QuestionController {
     @PutMapping("api/question/star")
     String star(@RequestParam boolean starOrUnstar,
               @RequestParam int id,
+              @RequestParam String qAnswer,
+              @RequestParam String qBody,
               @RequestParam String label,
               @RequestParam Course course){
         Customer customer = securityRelated.getCustomer();
         Question question = questionRepository.findById(id).orElseGet(
-                () -> questionRepository.save(new Question(id, "", "", label, course))
+                () -> questionRepository.save(new Question(id, qAnswer, qBody, label, course))
         );
         Optional<UserQuestion> uq = userQuestionRepository.findByUserQuestionId(new UserQuestionId(customer, question));
         if(uq.isEmpty()) {
@@ -77,6 +71,18 @@ public class QuestionController {
         }
         return "ok";
     }
+
+    @GetMapping("/api/question/star")
+    List<StarredQuestionReturn> getStar(){
+        Customer customer = securityRelated.getCustomer();
+        List<UserQuestion> userQuestions = userQuestionRepository
+                .findByUserQuestionId_CustomerAndHasStar(customer, true);
+        return userQuestions.stream()
+                .map(uq -> new StarredQuestionReturn(
+                        uq.getUserQuestionId().getQuestion(), uq.getTotalCount(), uq.getWrongCount()))
+                .collect(Collectors.toList());
+    }
+
 
     @GetMapping("/api/question/recommend")
     Object recommend(@RequestParam Course course,
