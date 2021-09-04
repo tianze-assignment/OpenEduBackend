@@ -40,4 +40,6 @@ public class History {
 
     private String uri;
 
+    private String category;
+
 }
