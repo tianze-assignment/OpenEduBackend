@@ -44,4 +44,18 @@ public class History {
 
     private String searchKey;
 
+    public History() {
+    }
+
+    public History(History history){
+        id = history.id;
+        customer = history.customer;
+        createdAt = history.createdAt;
+        type = history.type;
+        course = history.course;
+        name = history.name;
+        uri = history.uri;
+        category = history.category;
+        searchKey = history.searchKey;
+    }
 }

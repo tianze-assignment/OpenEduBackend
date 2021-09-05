@@ -28,8 +28,8 @@ Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZ
 }
 ###
 
-GET http://localhost:6789/api/history
-Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+GET http://localhost:6789/api/history/info
+Authorization: Bearer CUTlcX3MC4LDIS8m79mfW2kMWKhIN7rAkUyWJfEyQoi8no6mCAhCzszaEJKPXmbP
 
 ###
 DELETE http://tianze.site:6789/api/history/55
