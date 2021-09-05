@@ -50,9 +50,9 @@ id=53423&wrong=true&qAnswer=a&qBody=b&label=asdjoijf&course=MATH
 ###
 PUT http://localhost:6789/api/question/star
 Content-Type: application/x-www-form-urlencoded
-Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+Authorization: Bearer WuqtN35LAOtrMtQ17YhrRSvHWyzDNBn75JKYOi4UbAo1mXFJ410kL2S3VICG97OC
 
-id=53423&starOrUnstar=true&label=asdjoijf&course=MATH
+id=53423&starOrUnstar=true&qAnswer=&qBody=&label=asdjoijf&course=
 
 ###
 GET http://localhost:6789/api/question/recommend?course=GEO&number=5&openEduId=ac37f4d4-eaa0-4763-b7f1-7d931e1ab6e9

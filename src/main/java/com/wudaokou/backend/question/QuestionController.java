@@ -56,7 +56,7 @@ public class QuestionController {
               @RequestParam String qAnswer,
               @RequestParam String qBody,
               @RequestParam String label,
-              @RequestParam Course course){
+              @RequestParam(required = false) Course course){
         Customer customer = securityRelated.getCustomer();
         Question question = questionRepository.findById(id).orElseGet(
                 () -> questionRepository.save(new Question(id, qAnswer, qBody, label, course))
