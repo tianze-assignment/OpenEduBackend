@@ -21,4 +21,8 @@ public interface HistoryRepository extends JpaRepository<History, Integer> {
             + "WHERE h.customer = ?1 and h.course = ?2 and h.type = 'info'"
             + "GROUP BY h.name ORDER BY COUNT(h.name) Desc")
     List<String> findTopFrequentNameOfEntity(Customer customer, Course course, Pageable pageable);
+
+    @Query("SELECT h FROM History AS h "
+            + "WHERE h.type = 'search' GROUP BY h.name ORDER BY COUNT(h.name) Desc")
+    List<History> findTopFrequentNameOfSearch(Pageable pageable);
 }

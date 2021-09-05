@@ -2,6 +2,7 @@ package com.wudaokou.backend.history;
 
 import com.wudaokou.backend.login.Customer;
 import com.wudaokou.backend.login.SecurityRelated;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,6 +88,11 @@ public class HistoryController {
             }
         }
         return ResponseEntity.ok(new History());
+    }
+
+    @GetMapping("/popular_search_keys")
+    List<History> getPopular(){
+        return historyRepository.findTopFrequentNameOfSearch(PageRequest.of(0, 20));
     }
 
 }
