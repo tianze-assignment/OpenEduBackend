@@ -76,7 +76,7 @@ public class Recommend {
 
         assert responses != null;
 
-        for(QuestionResponse o : responses)
+//        for(QuestionResponse o : responses)
 //            logger.info("response: "+o.getData().toString());
 
         for (QuestionResponse res : responses) {
