@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -23,16 +24,30 @@ public class HistoryController {
         this.securityRelated = securityRelated;
     }
 
+    private History containsStarredEntity(List<History> list, History history){
+        for(History i : list)
+            if(i.getUri().equals(history.getUri()))
+                return i;
+        return null;
+    }
+
     @PostMapping("/api/history/{type}")
     Object postSearchHistory(@Valid @RequestBody History history,
                                                @PathVariable HistoryType type){
-        history.setType(type);
         Customer customer = securityRelated.getCustomer();
+        List<History> list = historyRepository.findAllByCustomerAndType(customer, type, Sort.by("createdAt").descending());
+        if(type == HistoryType.star){
+            // if it has been starred
+            History i = containsStarredEntity(list, history);
+            if(i != null)
+                return i;
+        }
+        history.setType(type);
         history.setCustomer(customer);
         History ret = historyRepository.save(history);
         if(type != HistoryType.search)
             return ret;
-        List<History> list = historyRepository.findAllByCustomerAndType(customer, type, Sort.by("createdAt").descending());
+        list.add(0, ret);
         while(list.size() > MAX_SEARCH_HISTORY_SIZE)
             historyRepository.deleteById( list.remove(MAX_SEARCH_HISTORY_SIZE).getId() );
         return list;
@@ -46,7 +61,15 @@ public class HistoryController {
         // Pageable pageable = PageRequest.of(page, size, sort);
         if(type == null)
             return historyRepository.findAllByCustomer(customer, sort);
-        return historyRepository.findAllByCustomerAndType(customer, type, sort);
+        if(type != HistoryType.info)
+            return historyRepository.findAllByCustomerAndType(customer, type, sort);
+        // if type is info
+        List<History> starredEntities = historyRepository.findAllByCustomerAndType(customer, HistoryType.star, sort);
+        List<History> historyEntities = historyRepository.findAllByCustomerAndType(customer, type, sort);
+        return historyEntities.stream().map(e -> new History(e){
+            final boolean hasStar = containsStarredEntity(starredEntities, e) != null;
+            public boolean getHasStar() {return hasStar;}
+        }).collect(Collectors.toList());
     }
 
     @DeleteMapping("/api/history/{s}")
