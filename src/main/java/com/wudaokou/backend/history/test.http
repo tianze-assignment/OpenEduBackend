@@ -59,7 +59,7 @@ GET http://localhost:6789/api/question/recommend?course=GEO&number=5&openEduId=a
 Authorization: Bearer WuqtN35LAOtrMtQ17YhrRSvHWyzDNBn75JKYOi4UbAo1mXFJ410kL2S3VICG97OC
 
 ###
-GET http://tianze.site:6789/api/question/recommend?course=GEO&number=5&openEduId=ac37f4d4-eaa0-4763-b7f1-7d931e1ab6e9
+GET http://tianze.site:6789/api/question/recommend?course=GEO&number=5&openEduId=2aac6373-62e0-41c0-8595-4f1e0934c26b
 Authorization: Bearer WuqtN35LAOtrMtQ17YhrRSvHWyzDNBn75JKYOi4UbAo1mXFJ410kL2S3VICG97OC
 
 ###
