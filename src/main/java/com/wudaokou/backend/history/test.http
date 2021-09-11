@@ -68,4 +68,8 @@ Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZ
 
 ###
 GET http://localhost:16789/open/instanceList?course=CHEMISTRY&searchKey=乳酸&id=60c5ca66-074b-44bb-bc40-67cd5f813770
-Authorization: Bearer -1
+Authorization: Bearer gBNXuouHftSAWiCyNClbFT7R4lWiJ8NJKbZ83rPIaTsgH9B1I74gYQL6FR7Xo5B7
+
+###
+GET http://localhost:16789/open/infoHasStar?uri=http://edukb.org/knowledge/0.1/instance/chemistry#-29104cd5637585885e1d44577c6a3ed3
+Authorization: Bearer gBNXuouHftSAWiCyNClbFT7R4lWiJ8NJKbZ83rPIaTsgH9B1I74gYQL6FR7Xo5B7
