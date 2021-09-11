@@ -13,6 +13,7 @@ public interface HistoryRepository extends JpaRepository<History, Integer> {
     List<History> findAllByCustomer(Customer customer, Sort sort);
 //    List<History> findAllByCustomer(Customer customer, Pageable pageable);
     List<History> findAllByCustomerAndType(Customer customer, HistoryType type, Sort sort);
+    List<History> findAllByCustomerAndType(Customer customer, HistoryType type);
 //    List<History> findAllByCustomerAndType(Customer customer, HistoryType type, Pageable pageable);
     @Transactional
     void deleteByCustomerAndType(Customer customer, HistoryType type);
