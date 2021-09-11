@@ -8,4 +8,5 @@ public class Instance {
     String category;
     String uri;
     boolean hasStar;
+    int id;
 }

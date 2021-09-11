@@ -8,14 +8,11 @@ import com.wudaokou.backend.login.Customer;
 import com.wudaokou.backend.login.SecurityRelated;
 import com.wudaokou.backend.openEdu.response.Instance;
 import com.wudaokou.backend.openEdu.response.ReturnList;
-import org.hibernate.mapping.Map;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestMapping("/open")
@@ -42,12 +39,41 @@ public class OpenEduController {
         if(rsp == null)
             return ResponseEntity.internalServerError();
         if(customer.isPresent()){
-            HashSet<String> set = historyRepository.findAllByCustomerAndType(customer.get(), HistoryType.star).stream()
-                    .map(History::getUri).collect(Collectors.toCollection(HashSet::new));
+            Map<String, Integer> map = historyRepository.findAllByCustomerAndType(customer.get(), HistoryType.star).stream()
+                    .map(h -> Map.of(h.getUri(), h.getId()))
+                    .flatMap(m -> m.entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             rsp.setData(rsp.getData().stream()
-                            .peek(v -> v.setHasStar(set.contains(v.getUri()))).collect(Collectors.toList()));
+                            .peek(v -> {
+                                if(map.containsKey(v.getUri())){
+                                    v.setHasStar(true);
+                                    v.setId(map.get(v.getUri()));
+                                }
+                            }).collect(Collectors.toList()));
         }
         return rsp;
+    }
+
+    @GetMapping("/infoHasStar")
+    Object infoHasStar(@RequestHeader("Authorization") String token,
+                       @RequestParam String uri){
+        Optional<Customer> customer = securityRelated.getCustomer(token);
+        boolean hasStar = false;
+        int id = 0;
+        if(customer.isPresent()){
+            Map<String, Integer> map = historyRepository.findAllByCustomerAndType(customer.get(), HistoryType.star).stream()
+                    .map(h -> Map.of(h.getUri(), h.getId()))
+                    .flatMap(m -> m.entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            if(map.containsKey(uri)){
+                hasStar = true;
+                id = map.get(uri);
+            }
+        }
+        return Map.of(
+                "hasStar", hasStar,
+                "id", id
+        );
     }
 
 
