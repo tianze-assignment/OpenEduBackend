@@ -65,3 +65,7 @@ Authorization: Bearer WuqtN35LAOtrMtQ17YhrRSvHWyzDNBn75JKYOi4UbAo1mXFJ410kL2S3VI
 ###
 GET http://localhost:6789/api/question/star
 Authorization: Bearer ieyMlHM6iYRExfQjkrdkGaTrd7bThLDv9DnbbE4gr7ydViWDz0pWguaCgZoMgNma
+
+###
+GET http://localhost:16789/open/instanceList?course=CHEMISTRY&searchKey=乳酸&id=60c5ca66-074b-44bb-bc40-67cd5f813770
+Authorization: Bearer -1
