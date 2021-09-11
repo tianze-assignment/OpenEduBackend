@@ -77,7 +77,8 @@ public class HistoryController {
     ResponseEntity<?> delete(@PathVariable String s){
         try {
             int id = Integer.parseInt(s);
-            historyRepository.deleteById(id);
+            if(historyRepository.findById(id).isPresent())
+                historyRepository.deleteById(id);
         }catch(NumberFormatException nfe){
             try{
                 Customer customer = securityRelated.getCustomer();
